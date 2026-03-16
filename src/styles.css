@@ -446,6 +446,18 @@ details[open] .content-wrapper {
    RESPONSIVE
    ─────────────────────────────────────────────────────────────────────────── */
 @media (max-width: 600px) {
+  .header-inner {
+    flex-wrap: wrap;
+  }
+
+  .header-controls {
+    flex-wrap: wrap;
+  }
+
+  .expand-btn {
+    white-space: normal;
+  }
+
   .row-summary {
     grid-template-columns: 1fr auto auto;
     gap: 0.4rem 0.6rem;
