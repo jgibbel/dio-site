@@ -1,0 +1,574 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   DESIGN TOKENS
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Palette — high contrast neutral with brown-purple accent */
+  --color-bg:           #f5f5f3;   /* clean cool off-white */
+  --color-surface:      #ffffff;   /* pure white for open rows */
+  --color-essay-closed: #ebebea;   /* essay hero bg */
+  --color-border:       #d0d0ce;
+  --color-text:         #0c0c0c;   /* near black */
+  --color-muted:        #767676;
+  --color-accent:       #5c2d5e;   /* luscious brown-purple */
+  --color-link:         #5c2d5e;
+
+  /* Typography */
+  --font-serif:   'Cormorant Garamond', Georgia, serif;
+  --font-sans:    'DM Sans', system-ui, sans-serif;
+  --font-title:   Arial, Helvetica, sans-serif;
+  --font-mono:    'Courier New', Courier, monospace;
+
+  /* Sizing */
+  --poem-row-height:    75px;
+  --essay-row-height-sm: 33vh;
+  --essay-row-height-md: 44vh;
+  --essay-row-height-lg: 50vh;
+
+  /* Spacing */
+  --row-px:      clamp(1.25rem, 4vw, 3.5rem);
+  --content-max: 65ch;
+
+  /* Animation */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RESET & BASE
+   ─────────────────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  min-height: 100dvh;
+}
+
+/* Strip default details/summary markers */
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   LAYOUT
+   ─────────────────────────────────────────────────────────────────────────── */
+.site-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   HEADER
+   ─────────────────────────────────────────────────────────────────────────── */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.header-inner {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem var(--row-px);
+}
+
+.manuscript-title {
+  font-family: var(--font-title);
+  font-size: clamp(2rem, 4.2vw, 3.6rem);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  /* padding: 0 0 0 5vw; */
+}
+
+.manuscript-author {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-top: 0.15rem;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PDF BUTTON
+   ─────────────────────────────────────────────────────────────────────────── */
+.pdf-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  text-decoration: none;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  padding: 0.4rem 0.75rem;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.pdf-button:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.pdf-icon {
+  flex-shrink: 0;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.expand-controls {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.expand-btn {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.expand-btn:hover {
+  color: var(--color-accent);
+  border-color: var(--color-border);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MANUSCRIPT LIST
+   ─────────────────────────────────────────────────────────────────────────── */
+.manuscript-list {
+  flex: 1;
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MANUSCRIPT ROW — BASE
+   ─────────────────────────────────────────────────────────────────────────── */
+.manuscript-row {
+  transition: background 0.3s var(--ease-out);
+}
+
+/* expand-up: content renders above the title */
+.manuscript-row.expand-up {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+/* ── Summary bar ──────────────────────────────────────────────────────────── */
+.row-summary {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0 var(--row-px);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.row-summary:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+
+.row-title {
+  font-family: var(--font-title);
+  font-size: clamp(8px, 3.8vw, 80px);
+  font-weight: 700;
+  white-space: pre-wrap;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  transition: letter-spacing 0.25s var(--ease-out);
+}
+
+.row-type-label {
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.row-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-muted);
+  transition: color 0.2s, transform 0.3s var(--ease-out);
+}
+
+.toggle-vertical {
+  transition: transform 0.3s var(--ease-out), opacity 0.3s;
+  transform-origin: center;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   POEM ROW
+   ─────────────────────────────────────────────────────────────────────────── */
+.type-poem .row-summary {
+  min-height: var(--poem-row-height);
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.type-poem:hover:not(.is-open) {
+  background: color-mix(in srgb, var(--color-border) 30%, transparent);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ESSAY ROW — CLOSED HERO STATES
+   ─────────────────────────────────────────────────────────────────────────── */
+.type-essay .row-summary {
+  grid-template-rows: auto 1fr;
+  /* Title row + preview area */
+  min-height: var(--essay-row-height-sm);
+  align-items: start;
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+  background: var(--color-essay-closed);
+  transition: background 0.3s var(--ease-out);
+}
+
+/* Title strip within essay summary */
+.type-essay .row-title {
+  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+  font-weight: 500;
+}
+
+/* Essay preview area — spans all columns beneath the title row */
+.essay-preview {
+  grid-column: 1 / -1;
+  padding: 0.5rem 0 0.25rem;
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+
+.is-open .essay-preview {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Pull-quote layout */
+.layout-pullquote .row-summary {
+  min-height: var(--essay-row-height-md);
+}
+
+.preview-pullquote {
+  font-family: var(--font-serif);
+  font-size: clamp(1.2rem, 2.8vw, 2rem);
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  color: var(--color-accent);
+  border: none;
+  max-width: 70ch;
+  padding: 1rem 0;
+}
+
+/* Description layout */
+.layout-description .row-summary {
+  min-height: var(--essay-row-height-sm);
+}
+
+.preview-description {
+  font-family: var(--font-serif);
+  font-size: clamp(1rem, 1.8vw, 1.3rem);
+  font-style: italic;
+  color: var(--color-muted);
+  max-width: 60ch;
+  line-height: 1.5;
+  padding: 0.75rem 0;
+}
+
+/* Image layout */
+.layout-image .row-summary {
+  min-height: var(--essay-row-height-lg);
+}
+
+.preview-image {
+  width: 100%;
+  height: 28vh;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  border-radius: 2px;
+  margin-top: 0.5rem;
+  /* Fade out the image when expanded without shifting layout */
+  transition: opacity 0.3s ease, height 0.4s var(--ease-out);
+}
+
+.is-open .preview-image {
+  opacity: 0;
+  height: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   OPEN STATE
+   ─────────────────────────────────────────────────────────────────────────── */
+.is-open {
+  background: var(--color-surface);
+}
+
+.is-open .row-summary {
+  background: var(--color-surface);
+}
+
+.is-open .type-essay .row-title,
+.is-open .row-title {
+  letter-spacing: 0.015em;
+}
+
+/* Rotate the minus arm of the +/− toggle */
+.is-open .toggle-vertical {
+  transform: scaleY(0);
+  opacity: 0;
+}
+
+.is-open .row-toggle {
+  color: var(--color-accent);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ANIMATED CONTENT WRAPPER (CSS grid trick)
+   Requires the inner div to have overflow: hidden.
+   ─────────────────────────────────────────────────────────────────────────── */
+.content-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.45s var(--ease-out);
+}
+
+details[open] .content-wrapper {
+  grid-template-rows: 1fr;
+}
+
+.content-inner {
+  overflow: hidden;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   POEM CONTENT
+   ─────────────────────────────────────────────────────────────────────────── */
+.poem-body {
+  font-family: var(--font-sans);
+  font-size: clamp(14px, 1.8vw, 20px);
+  font-weight: 400;
+  /* white-space: pre-wrap; */
+  line-height: 1.75;
+  letter-spacing: 0.01em;
+  padding: 2.5rem var(--row-px);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ESSAY CONTENT
+   ─────────────────────────────────────────────────────────────────────────── */
+.essay-body {
+  max-width: var(--content-max);
+  padding: 2.5rem var(--row-px) 3rem;
+  font-family: var(--font-sans);
+  font-size: clamp(1rem, 1.6vw, 1.15rem);
+  line-height: 1.75;
+  color: var(--color-text);
+}
+
+.essay-body p {
+  margin-bottom: 1.4em;
+}
+
+.essay-body p:last-child {
+  margin-bottom: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   FOOTER
+   ─────────────────────────────────────────────────────────────────────────── */
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem var(--row-px);
+  border-top: 1px solid var(--color-border);
+}
+
+.footer-copy {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RESPONSIVE
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .row-summary {
+    grid-template-columns: 1fr auto auto;
+    gap: 0.4rem 0.6rem;
+  }
+
+  .poem-body {
+    padding: 1.75rem var(--row-px);
+  }
+
+  .essay-body {
+    padding: 1.75rem var(--row-px) 2.25rem;
+  }
+
+  .preview-pullquote {
+    font-size: clamp(1.05rem, 5vw, 1.4rem);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PER-POEM OVERRIDES
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* p01 — O' : centered italic monospace with generous whitespace */
+.poem-p01 {
+  font-family: var(--font-mono);
+  font-style: italic;
+  font-size: clamp(0.85rem, 1.4vw, 1rem);
+  text-align: center;
+  line-height: 1.5;
+  white-space: normal;
+  padding-top: 8vh;
+  padding-bottom: 10vh;
+  max-width: none;
+}
+
+/* p02 — And : right-aligned italic monospace with mixed emphasis */
+.poem-p02 {
+  font-family: var(--font-mono);
+  font-style: italic;
+  font-size: clamp(0.85rem, 1.4vw, 1rem);
+  text-align: right;
+  line-height: 1.5;
+  white-space: normal;
+  padding-top: 4vh;
+  padding-bottom: 8vh;
+  max-width: none;
+}
+
+.poem-p02 p:last-child {
+  margin-top: 0.75em;
+}
+
+/* p03 — H A P P I N E S S : monospace left-aligned, Goddess offset, closing lines indented */
+.poem-p03 {
+  font-family: var(--font-mono);
+  font-size: clamp(0.85rem, 1.4vw, 1rem);
+  text-align: left;
+  line-height: 1.8;
+  white-space: normal;
+  padding-top: 6vh;
+  padding-bottom: 8vh;
+  max-width: none;
+}
+
+/* "Goddess" — pushed toward center with a proportional indent */
+.poem-p03 p:nth-child(2) {
+  padding-left: 20vw;
+  font-style: italic;
+  margin-bottom: 0.5em;
+}
+
+/* last two lines — indented step in */
+.poem-p03 p:nth-last-child(2),
+.poem-p03 p:last-child {
+  padding-left: 4ch;
+  margin-top: 0;
+}
+
+/* p04 — BLUE : prose opener left-aligned, stanza indented italic */
+.poem-p04 {
+  font-family: var(--font-mono);
+  font-size: clamp(0.85rem, 1.4vw, 1rem);
+  text-align: left;
+  line-height: 1.8;
+  white-space: normal;
+  padding-top: 4vh;
+  padding-bottom: 8vh;
+  max-width: none;
+}
+
+/* stanza lines — indented and italic */
+.poem-p04 p:not(:first-child) {
+  padding-left: 20vw;
+  font-style: italic;
+  line-height: 1.6;
+}
+
+/* p07 — There : bold monospace, last line indented */
+.poem-p07 {
+  font-family: var(--font-mono);
+  font-weight: bold;
+  font-size: clamp(0.85rem, 1.4vw, 1rem);
+  line-height: 1.5;
+  white-space: normal;
+  padding-top: 5vh;
+  padding-bottom: 8vh;
+  max-width: none;
+}
+
+.poem-p07 .indent {
+  padding-left: 4ch;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ACCESSIBILITY — reduced motion
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .content-wrapper,
+  .row-toggle,
+  .toggle-vertical,
+  .essay-preview,
+  .preview-image,
+  .pdf-button {
+    transition: none;
+  }
+}
